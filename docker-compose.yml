@@ -1,0 +1,26 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: campaign-builder-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - campaign-data:/app/data  # Persist SQLite database at /app/data/campaigns.db
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DATABASE_URL=sqlite:///./campaigns.db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: campaign-builder-ui
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  campaign-data:
