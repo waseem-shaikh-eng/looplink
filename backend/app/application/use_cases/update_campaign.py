@@ -37,17 +37,25 @@ class UpdateCampaignUseCase:
                 f"Current status: {campaign.status.value}"
             )
 
-        if request.name is not None:
+        changed = False
+        if request.name is not None and request.name != campaign.name:
             campaign.name = request.name
-        if request.description is not None:
+            changed = True
+        if request.description is not None and request.description != campaign.description:
             campaign.description = request.description
-        if request.starts_at is not None:
+            changed = True
+        if request.starts_at is not None and request.starts_at != campaign.starts_at:
             campaign.starts_at = request.starts_at
-        if request.ends_at is not None:
+            changed = True
+        if request.ends_at is not None and request.ends_at != campaign.ends_at:
             campaign.ends_at = request.ends_at
+            changed = True
 
-        self._uow.campaigns.save(campaign)
-        self._uow.commit()
+        if changed:
+            self._uow.campaigns.save(campaign)
+            self._uow.commit()
+        else:
+            self._uow.commit()
 
         offers = self._uow.offers.get_by_campaign_id(campaign_id)
         return CampaignResponse.from_domain(campaign, offers)

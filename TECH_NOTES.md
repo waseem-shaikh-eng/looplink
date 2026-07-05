@@ -151,7 +151,7 @@ I used AI tools (Claude / opencode) to:
 - Refactor inline styles into CSS variables and shared components during the UI overhaul.
 - Draft this TECH_NOTES.md based on a structured outline.
 
-Every piece of AI-generated code was reviewed, tested, and often rewritten. I did not submit code I couldn't explain — the state machine logic, offer validation, normalization, separation of DTOs, and optimistic locking are my own design, implemented and verified.
+Every piece of AI-generated code was reviewed, tested, and often rewritten. the state machine logic, offer validation, normalization, separation of DTOs, and optimistic locking are my own design, implemented and verified.
 
 ---
 

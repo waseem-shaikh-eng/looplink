@@ -16,7 +16,7 @@ const variants = {
 
 export default function Button({
   children, variant = 'primary', size = 'md', disabled, loading,
-  onClick, type = 'button', style, icon, fullWidth,
+  onClick, type = 'button', style, icon, fullWidth, tooltip,
 }) {
   const v = variants[variant] || variants.primary;
   const s = sizes[size] || sizes.md;
@@ -26,6 +26,7 @@ export default function Button({
       type={type}
       disabled={disabled || loading}
       onClick={onClick}
+      data-tooltip={(!disabled && !loading && tooltip) ? tooltip : undefined}
       style={{
         display: 'inline-flex',
         alignItems: 'center',

@@ -11,6 +11,12 @@ function toLocalDatetime(utcStr) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+function nowLocalDatetime() {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 export default function CampaignForm({ defaultValues, onSubmit, loading }) {
   const {
     register,
@@ -66,6 +72,7 @@ export default function CampaignForm({ defaultValues, onSubmit, loading }) {
           <input
             {...register('starts_at')}
             type="datetime-local"
+            min={nowLocalDatetime()}
             style={inputStyle}
           />
         </FormField>
@@ -74,13 +81,14 @@ export default function CampaignForm({ defaultValues, onSubmit, loading }) {
           <input
             {...register('ends_at')}
             type="datetime-local"
+            min={nowLocalDatetime()}
             style={inputStyle}
           />
         </FormField>
       </div>
 
       <div style={{ paddingTop: 8 }}>
-        <Button type="submit" disabled={loading} loading={loading}>
+        <Button type="submit" disabled={loading} loading={loading} tooltip={isEdit ? 'Save campaign changes' : 'Create a new campaign'}>
           {isEdit ? 'Save Changes' : 'Create Campaign'}
         </Button>
       </div>

@@ -85,10 +85,17 @@ class TestDraftState:
         draft_campaign.launch()
         assert draft_campaign.status == CampaignStatus.LIVE
 
-    def test_launch_rejects_invalid_window(self, draft_campaign, offer, past_date):
+    def test_launch_rejects_past_ends_at(self, draft_campaign, offer, past_date):
         draft_campaign.add_offer(offer)
         draft_campaign.starts_at = datetime.now(timezone.utc)
         draft_campaign.ends_at = datetime.now(timezone.utc) - timedelta(days=1)
+        with pytest.raises(BusinessRuleViolation, match="ends_at must be in the future"):
+            draft_campaign.launch()
+
+    def test_launch_rejects_invalid_window(self, draft_campaign, offer, future_date):
+        draft_campaign.add_offer(offer)
+        draft_campaign.starts_at = future_date
+        draft_campaign.ends_at = future_date - timedelta(days=1)
         with pytest.raises(BusinessRuleViolation, match="ends_at must be after starts_at"):
             draft_campaign.launch()
 

@@ -14,10 +14,15 @@ if TYPE_CHECKING:
 class DraftState(CampaignState):
     """A newly created campaign that can be edited, scheduled, or launched."""
 
+    def _ensure_ends_at_is_future(self, campaign: Campaign) -> None:
+        if campaign.ends_at and campaign.ends_at <= datetime.now(timezone.utc):
+            raise BusinessRuleViolation("ends_at must be in the future")
+
     def schedule(self, campaign: Campaign, starts_at: datetime) -> None:
         if starts_at <= datetime.now(timezone.utc):
             raise BusinessRuleViolation("starts_at must be in the future")
 
+        self._ensure_ends_at_is_future(campaign)
         campaign.starts_at = starts_at
         campaign.validate_window(require_future_starts=True)
         campaign.validate_has_offers()
@@ -28,6 +33,7 @@ class DraftState(CampaignState):
         campaign._state = ScheduledState()
 
     def launch(self, campaign: Campaign) -> None:
+        self._ensure_ends_at_is_future(campaign)
         campaign.validate_window(require_future_starts=False)
         campaign.validate_has_offers()
 

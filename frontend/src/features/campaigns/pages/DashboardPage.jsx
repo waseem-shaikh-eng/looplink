@@ -55,10 +55,10 @@ export default function DashboardPage() {
         subtitle="Overview of your campaigns"
         actions={
           <>
-            <Button variant="ghost" onClick={() => navigate('/builder/campaigns')}>
+            <Button variant="ghost" onClick={() => navigate('/builder/campaigns')} tooltip="See all campaigns">
               View All
             </Button>
-            <Button onClick={() => navigate('/builder/campaigns/new')} icon="+">
+            <Button onClick={() => navigate('/builder/campaigns/new')} icon="+" tooltip="Create a new campaign">
               New Campaign
             </Button>
           </>
@@ -103,6 +103,7 @@ export default function DashboardPage() {
               <div
                 key={c.id}
                 onClick={() => navigate(`/builder/campaigns/${c.id}`)}
+                data-tooltip="View campaign"
                 style={{
                   borderRadius: 'var(--radius-md)',
                   border: '1px solid var(--color-border)',

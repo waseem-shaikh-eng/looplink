@@ -35,11 +35,12 @@ export default function EnrollmentForm({ onSubmit, loading }) {
     <form onSubmit={handleSubmit(handleFormSubmit)}>
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
         {TYPES.map((t) => (
-          <button
-            key={t.value}
-            type="button"
-            onClick={() => setIdentityType(t.value)}
-            style={{
+            <button
+              key={t.value}
+              type="button"
+              onClick={() => setIdentityType(t.value)}
+              data-tooltip={`Use ${t.label}`}
+              style={{
               flex: 1,
               padding: '8px 16px',
               borderRadius: 'var(--radius-md)',
@@ -70,7 +71,7 @@ export default function EnrollmentForm({ onSubmit, loading }) {
         />
       </FormField>
 
-      <Button type="submit" disabled={loading} fullWidth size="lg" variant="success" loading={loading}>
+      <Button type="submit" disabled={loading} fullWidth size="lg" variant="success" loading={loading} tooltip="Submit your enrollment">
         {loading ? 'Enrolling...' : '🎉 Enroll Now'}
       </Button>
     </form>

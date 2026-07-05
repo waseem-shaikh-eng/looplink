@@ -157,11 +157,12 @@ export default function CampaignEditPage() {
           </code>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          {campaign.status !== 'ended' && (
+          {campaign.status === 'live' && (
             <Button
               variant="outline"
               size="sm"
               onClick={() => navigate(`/builder/campaigns/${id}/distribution`)}
+              tooltip="View QR code and shareable link"
             >
               📍 Distribution
             </Button>
@@ -172,6 +173,7 @@ export default function CampaignEditPage() {
               size="sm"
               onClick={() => setShowDeleteModal(true)}
               disabled={deleteMutation.isPending}
+              tooltip="Permanently delete this campaign"
             >
               Delete
             </Button>
@@ -188,6 +190,7 @@ export default function CampaignEditPage() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
+            data-tooltip={`${tab} tab`}
             style={{
               padding: '12px 24px',
               background: 'none',
@@ -269,6 +272,7 @@ export default function CampaignEditPage() {
                 loading={offersMutation.isPending}
                 disabled={offersMutation.isPending}
                 size="sm"
+                tooltip="Save all offer changes"
               >
                 Save Offers
               </Button>

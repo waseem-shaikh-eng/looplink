@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiShare2 } from 'react-icons/fi';
+import { FiEdit, FiShare2 } from 'react-icons/fi';
 import { useCampaigns } from '../hooks/useCampaigns';
 import Button from '../../../shared/components/Button';
 import Card from '../../../shared/components/Card';
@@ -72,7 +72,7 @@ export default function CampaignListPage() {
         title="Campaigns"
         subtitle={`${allCampaigns.length} total · ${filtered.length} shown`}
         actions={
-          <Button onClick={() => navigate('/builder/campaigns/new')} icon="+">
+          <Button onClick={() => navigate('/builder/campaigns/new')} icon="+" tooltip="Create a new campaign">
             New Campaign
           </Button>
         }
@@ -111,6 +111,7 @@ export default function CampaignListPage() {
             <button
               key={f.value}
               onClick={() => setFilter(f.value)}
+              data-tooltip={`Filter: ${f.label}`}
               style={{
                 padding: '8px 16px',
                 borderRadius: 'var(--radius-md)',
@@ -148,79 +149,123 @@ export default function CampaignListPage() {
           />
         </Card>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {filtered.map((c) => (
-            <div key={c.id}>
-              <div
-                onClick={() => navigate(`/builder/campaigns/${c.id}`)}
-                className="campaign-card"
-                style={{
-                  background: 'var(--color-surface)',
-                  borderRadius: shareId === c.id ? 'var(--radius-md) var(--radius-md) 0 0' : 'var(--radius-md)',
-                  border: '1px solid var(--color-border)',
-                  padding: '12px 20px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  cursor: 'pointer',
-                  transition: 'all var(--transition-fast)',
-                  animation: 'fadeIn 0.3s ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--color-primary)';
-                  e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = shareId === c.id ? 'var(--color-primary)' : 'var(--color-border)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              >
-                <div>
-                  <p style={{ margin: '0 0 4px', fontWeight: 600, fontSize: 15, color: 'var(--color-text)' }}>
-                    {c.name}
-                  </p>
-                  {c.description && (
-                    <p style={{ margin: 0, fontSize: 13, color: 'var(--color-text-muted)' }}>
-                      {c.description}
-                    </p>
-                  )}
-                </div>
-                <div className="campaign-actions" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  <StatusBadge status={c.status} />
-                  <span style={{ fontSize: 12, color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-                    v{c.version}
-                  </span>
-                  <div
-                    onClick={(e) => { e.stopPropagation(); setShareId(shareId === c.id ? null : c.id); }}
+        <div className="campaign-table" style={{
+          background: 'var(--color-surface)',
+          borderRadius: 'var(--radius-lg)',
+          border: '1px solid var(--color-border)',
+          overflow: 'hidden',
+        }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+            <thead>
+              <tr style={{
+                background: 'var(--color-bg)',
+                borderBottom: '1px solid var(--color-border)',
+              }}>
+                <th style={thStyle}>Name</th>
+                <th style={thStyle}>Status</th>
+                <th style={thStyle}>Version</th>
+                <th style={{ ...thStyle, textAlign: 'right' }}>Share | Edit</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((c) => (
+                <Fragment key={c.id}>
+                  <tr
                     style={{
-                      padding: '4px 8px', borderRadius: 'var(--radius-sm)',
-                      fontSize: 16, cursor: 'pointer',
-                      background: shareId === c.id ? 'var(--color-primary-light)' : 'transparent',
-                      color: shareId === c.id ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                      transition: 'background var(--transition-fast)',
                     }}
-                    title="Share"
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--color-bg)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                   >
-                    <FiShare2 size={14} />
-                  </div>
-                </div>
-              </div>
-              {shareId === c.id && (
-                <div style={{
-                  padding: 16, border: '1px solid var(--color-primary)',
-                  borderTop: 'none', borderRadius: '0 0 var(--radius-md) var(--radius-md)',
-                  background: 'var(--color-bg)',
-                  animation: 'fadeIn 0.2s ease',
-                }}>
-                  <DistributionCard
-                    campaignId={c.id}
-                    publicToken={c.public_token}
-                  />
-                </div>
-              )}
-            </div>
-          ))}
+                    <td style={tdStyle}>
+                      <div>
+                        <span style={{ fontWeight: 600, color: 'var(--color-text)' }}>{c.name}</span>
+                        {c.description && (
+                          <p style={{ margin: '2px 0 0', fontSize: 13, color: 'var(--color-text-muted)' }}>
+                            {c.description}
+                          </p>
+                        )}
+                      </div>
+                    </td>
+                    <td style={tdStyle}><StatusBadge status={c.status} /></td>
+                    <td style={{ ...tdStyle, fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--color-text-muted)' }}>
+                      v{c.version}
+                    </td>
+                    <td style={{ ...tdStyle, textAlign: 'right', whiteSpace: 'nowrap' }}>
+                      <div style={{ display: 'inline-flex', gap: 4, alignItems: 'center' }}>
+                        {c.status === 'live' && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setShareId(shareId === c.id ? null : c.id); }}
+                            style={{
+                              padding: '6px 8px', borderRadius: 'var(--radius-sm)',
+                              border: 'none',
+                              background: shareId === c.id ? 'var(--color-primary-light)' : 'transparent',
+                              color: shareId === c.id ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                              cursor: 'pointer',
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.color = 'var(--color-primary)'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--color-border)'; e.currentTarget.style.color = 'var(--color-text)'; }}
+                            data-tooltip="Share campaign"
+                          >
+                            <FiShare2 size={14} />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => navigate(`/builder/campaigns/${c.id}`)}
+                          style={{
+                              padding: '6px 8px', borderRadius: 'var(--radius-sm)',
+                              border: 'none',
+                              background: shareId === c.id ? 'var(--color-primary-light)' : 'transparent',
+                              color: shareId === c.id ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                              cursor: 'pointer',
+                            }}
+                          data-tooltip="Edit"
+                          onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.color = 'var(--color-primary)'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--color-border)'; e.currentTarget.style.color = 'var(--color-text)'; }}
+                        >
+                          <FiEdit size={14} style={{ marginRight: 4 }} color='#6610f2' />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  {c.status === 'live' && shareId === c.id && (
+                    <tr>
+                      <td colSpan={4} style={{ padding: 0, borderBottom: '1px solid var(--color-border)' }}>
+                        <div style={{
+                          padding: 16,
+                          background: 'var(--color-bg)',
+                          animation: 'fadeIn 0.2s ease',
+                        }}>
+                          <DistributionCard
+                            campaignId={c.id}
+                            publicToken={c.public_token}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </Layout>
   );
 }
+
+const thStyle = {
+  padding: '12px 16px',
+  textAlign: 'left',
+  fontWeight: 600,
+  fontSize: 12,
+  textTransform: 'uppercase',
+  letterSpacing: '0.04em',
+  color: 'var(--color-text-muted)',
+};
+
+const tdStyle = {
+  padding: '14px 16px',
+  verticalAlign: 'middle',
+  borderBottom: '1px solid var(--color-border-light)',
+};

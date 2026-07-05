@@ -51,7 +51,6 @@ class SetOffersUseCase:
             self._uow.offers.save(offer)
             offers.append(offer)
 
-        self._uow.campaigns.save(campaign)
         self._uow.commit()
 
         return CampaignResponse.from_domain(campaign, offers)

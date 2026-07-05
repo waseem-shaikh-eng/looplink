@@ -5,6 +5,8 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
+from datetime import datetime, timezone
+
 from app.domain.entities.campaign import Campaign
 from app.domain.enums.campaign_status import CampaignStatus
 from app.domain.exceptions import EntityNotFound, OptimisticLockError
@@ -53,11 +55,22 @@ class SQLAlchemyCampaignRepository(CampaignRepository):
             existing.ends_at = campaign.ends_at
             existing.updated_at = campaign.updated_at
 
+    def _auto_end_if_expired(self, campaign: Campaign) -> Campaign:
+        if campaign.status == CampaignStatus.LIVE and campaign.ends_at:
+            ends_at = campaign.ends_at
+            if ends_at.tzinfo is None:
+                ends_at = ends_at.replace(tzinfo=timezone.utc)
+            if ends_at < datetime.now(timezone.utc):
+                campaign.end()
+                self.save(campaign)
+                self._session.flush()
+        return campaign
+
     def get_by_id(self, campaign_id: UUID) -> Optional[Campaign]:
         model = self._session.get(CampaignModel, campaign_id)
         if model is None:
             return None
-        return self._to_domain(model)
+        return self._auto_end_if_expired(self._to_domain(model))
 
     def get_by_public_token(self, token: str) -> Optional[Campaign]:
         model = (
@@ -67,11 +80,11 @@ class SQLAlchemyCampaignRepository(CampaignRepository):
         )
         if model is None:
             return None
-        return self._to_domain(model)
+        return self._auto_end_if_expired(self._to_domain(model))
 
     def list_all(self) -> List[Campaign]:
         models = self._session.query(CampaignModel).order_by(CampaignModel.created_at.desc()).all()
-        return [self._to_domain(m) for m in models]
+        return [self._auto_end_if_expired(self._to_domain(m)) for m in models]
 
     def delete(self, campaign_id: UUID) -> None:
         model = self._session.get(CampaignModel, campaign_id)

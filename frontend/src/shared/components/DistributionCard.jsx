@@ -81,7 +81,7 @@ export default function DistributionCard({ campaignId, publicToken, baseUrl }) {
           }}>
             {data.url}
           </div>
-          <Button size="xs" onClick={copyToClipboard} variant={copied ? 'success' : 'outline'}>
+          <Button size="xs" onClick={copyToClipboard} variant={copied ? 'success' : 'outline'} tooltip="Copy to clipboard">
             {copied ? '✓ Copied' : 'Copy Link'}
           </Button>
         </div>

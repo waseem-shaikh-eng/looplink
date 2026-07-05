@@ -119,15 +119,38 @@ style.textContent = `
 
   ::selection { background: var(--color-primary-light); color: var(--color-primary-text); }
 
+  [data-tooltip] {
+    position: relative;
+  }
+  [data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    background: #1e293b;
+    color: #fff;
+    font-size: 12;
+    font-weight: 500;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    font-family: var(--font-sans);
+  }
+  [data-tooltip]:hover::after { opacity: 1; }
+
   @media (min-width: 769px) {
-    .sidebar { transform: translateX(0) !important; }
     .sidebar-overlay { display: none !important; }
-    .sidebar-toggle { display: none !important; }
     .sidebar-close { display: none !important; }
   }
 
   @media (max-width: 768px) {
-    :root { --sidebar-width: 0px; }
+    .sidebar { width: 240px !important; }
+    .main-content-wrapper { margin-left: 0 !important; }
     .main-content { padding: 16px !important; }
     .tabs-bar { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .tabs-bar button { flex-shrink: 0; }
@@ -137,10 +160,26 @@ style.textContent = `
     .page-header-actions button { flex: 1; }
     .filter-pills { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
     .stat-grid { grid-template-columns: repeat(2, 1fr) !important; }
-    .campaign-card { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
-    .campaign-actions { width: 100%; justify-content: flex-start !important; }
     .lifecycle-buttons { flex-direction: column; }
     .lifecycle-buttons button { width: 100%; }
+  }
+
+  @media (max-width: 640px) {
+    .campaign-table table, .campaign-table thead, .campaign-table tbody,
+    .campaign-table th, .campaign-table td, .campaign-table tr {
+      display: block;
+    }
+    .campaign-table thead { display: none; }
+    .campaign-table tr {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .campaign-table td {
+      padding: 4px 0 !important;
+      border: none !important;
+    }
+    .campaign-table td:first-child { padding-top: 0 !important; }
+    .campaign-table td:last-child { padding-bottom: 0 !important; }
   }
 
   @media (max-width: 480px) {

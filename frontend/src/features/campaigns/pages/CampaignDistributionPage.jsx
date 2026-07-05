@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useCampaign } from '../hooks/useCampaigns';
 import { campaignApi } from '../api/campaignApi';
 import { useToast } from '../../../shared/lib/toast';
 import Card from '../../../shared/components/Card';
@@ -16,9 +17,11 @@ export default function CampaignDistributionPage() {
   const toast = useToast();
   const [copied, setCopied] = useState(false);
 
+  const { data: campaign, isLoading: campaignLoading } = useCampaign(id);
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['distribution', id],
     queryFn: () => campaignApi.getDistribution(id, window.location.origin),
+    enabled: !!campaign && campaign.status === 'live',
   });
 
   const copyToClipboard = async () => {
@@ -43,13 +46,43 @@ export default function CampaignDistributionPage() {
     }
   };
 
-  if (isLoading) {
+  if (campaignLoading || (!data && isLoading)) {
     return (
       <Layout>
         <div style={{ textAlign: 'center', padding: 80 }}>
           <Spinner size={36} />
-          <p style={{ color: 'var(--color-text-muted)', fontSize: 14, marginTop: 16 }}>Generating distribution...</p>
+          <p style={{ color: 'var(--color-text-muted)', fontSize: 14, marginTop: 16 }}>Loading...</p>
         </div>
+      </Layout>
+    );
+  }
+
+  if (campaign && campaign.status !== 'live') {
+    return (
+      <Layout>
+        <Link
+          to={`/builder/campaigns/${id}`}
+          style={{
+            color: 'var(--color-text-muted)', fontSize: 14, textDecoration: 'none',
+            display: 'inline-flex', alignItems: 'center', gap: 4, marginBottom: 20,
+          }}
+        >
+          ← Back to Campaign
+        </Link>
+        <Card style={{ textAlign: 'center', padding: 48 }}>
+          <div style={{
+            width: 64, height: 64, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'var(--color-warning-light)', borderRadius: '50%', margin: '0 auto 16px',
+            fontSize: 28, color: 'var(--color-warning)',
+          }}>
+            📅
+          </div>
+          <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 8px' }}>Not Yet Live</h2>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: 14, margin: '0 auto 24px', maxWidth: 400 }}>
+            Distribution tools (QR code and shareable link) are only available once the campaign is live. Launch or schedule the campaign to access them.
+          </p>
+          <Button onClick={() => navigate(`/builder/campaigns/${id}`)}>← Back to Campaign</Button>
+        </Card>
       </Layout>
     );
   }
@@ -144,12 +177,13 @@ export default function CampaignDistributionPage() {
                 <Button
                   onClick={copyToClipboard}
                   variant={copied ? 'success' : 'primary'}
+                  tooltip="Copy link to clipboard"
                 >
                   {copied ? '✓ Copied!' : '📋 Copy'}
                 </Button>
               </div>
               <a href={data.url} target="_blank" rel="noopener noreferrer">
-                <Button variant="outline" fullWidth>
+                <Button variant="outline" fullWidth tooltip="Open landing page in new tab">
                   🔗 Preview Public Page
                 </Button>
               </a>

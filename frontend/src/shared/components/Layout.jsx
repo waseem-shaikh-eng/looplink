@@ -117,7 +117,7 @@ export default function Layout({ children }) {
       </aside>
 
       {/* Main content */}
-      <div style={{ marginLeft: 'var(--sidebar-width)', flex: 1, minWidth: 0, transition: 'margin-left 0.3s ease' }}>
+      <div className="main-content-wrapper" style={{ marginLeft: 'var(--sidebar-width)', flex: 1, minWidth: 0, transition: 'margin-left 0.3s ease' }}>
         {/* Top bar with mobile menu button */}
         <div style={{
           display: 'flex',

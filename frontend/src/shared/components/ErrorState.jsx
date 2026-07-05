@@ -27,7 +27,7 @@ export default function ErrorState({ title, message, onRetry }) {
         </p>
       )}
       {onRetry && (
-        <Button onClick={onRetry} variant="primary">Try Again</Button>
+        <Button onClick={onRetry} variant="primary" tooltip="Retry loading">Try Again</Button>
       )}
     </div>
   );

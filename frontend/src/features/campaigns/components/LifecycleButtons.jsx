@@ -18,19 +18,19 @@ export default function LifecycleButtons({ campaign, onSchedule, onLaunch, onEnd
     <div>
       <div className="lifecycle-buttons" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
         {actions.includes('schedule') && !showSchedule && (
-          <Button variant="primary" onClick={() => setShowSchedule(true)} icon="📅">
+          <Button variant="primary" onClick={() => setShowSchedule(true)} icon="📅" tooltip="Schedule a future start date">
             Schedule
           </Button>
         )}
 
         {actions.includes('launch') && (
-          <Button variant="success" disabled={loading} onClick={onLaunch} icon="🚀">
+          <Button variant="success" disabled={loading} onClick={onLaunch} icon="🚀" tooltip="Launch campaign immediately">
             {loading ? 'Launching...' : 'Launch'}
           </Button>
         )}
 
         {actions.includes('end') && (
-          <Button variant="danger" disabled={loading} onClick={onEnd} icon="⏹">
+          <Button variant="danger" disabled={loading} onClick={onEnd} icon="⏹" tooltip="End this campaign">
             {loading ? 'Ending...' : 'End Campaign'}
           </Button>
         )}
@@ -78,10 +78,11 @@ export default function LifecycleButtons({ campaign, onSchedule, onLaunch, onEnd
                 onSchedule(new Date(scheduleDate).toISOString());
                 setShowSchedule(false);
               }}
+              tooltip="Set the campaign to scheduled"
             >
               Confirm Schedule
             </Button>
-            <Button variant="ghost" onClick={() => setShowSchedule(false)}>
+            <Button variant="ghost" onClick={() => setShowSchedule(false)} tooltip="Discard changes">
               Cancel
             </Button>
           </div>

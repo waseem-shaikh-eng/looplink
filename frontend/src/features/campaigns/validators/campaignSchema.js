@@ -3,8 +3,14 @@ import { z } from 'zod';
 export const campaignFormSchema = z.object({
   name: z.string().min(1, 'Name is required').max(255),
   description: z.string().max(1000).optional(),
-  starts_at: z.string().optional(),
-  ends_at: z.string().optional(),
+  starts_at: z.string().optional().refine((val) => {
+    if (!val) return true;
+    return new Date(val) >= new Date(new Date().toDateString());
+  }, { message: 'Start date must be today or later' }),
+  ends_at: z.string().optional().refine((val) => {
+    if (!val) return true;
+    return new Date(val) >= new Date(new Date().toDateString());
+  }, { message: 'End date must be today or later' }),
 });
 
 export const offerSchema = z.object({
